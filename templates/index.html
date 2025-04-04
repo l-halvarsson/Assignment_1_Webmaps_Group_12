@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webmaps Group 15</title>
 
-  <link rel="stylesheet" href="src/leaflet.css">
-  <link rel="stylesheet" href="src/plugins/L.Control.Zoomslider.css">
-  <link rel="stylesheet" href="src/plugins/L.Control.Sidebar.css">
 
-  <script src="src/leaflet-src.js"></script>
-  <script src="src/plugins/L.Control.Zoomslider.js"></script>
-  <script src="src/plugins/L.Control.Sidebar.js"></script>
-  <script src="src/jquery-3.6.0.min.js"></script>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='src/leaflet.css') }}">
+  <script src="{{ url_for('static', filename='src/jquery-3.6.0.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/leaflet.js') }}"></script>
+
+
+
 
   
 
@@ -22,16 +22,16 @@
     }  
     
     #side-bar {
-position: absolute;
-z-index: 1000;
-background: rgba(255,255,255,0.7);
-padding: 10px;
-right: 0;
-    top: 0;
-margin: 10px;
-border-radius: 10px;
-min-height: 200px;
-    }
+      position: absolute;
+      z-index: 1000;
+      background: rgba(255,255,255,0.7);
+      padding: 10px;
+      right: 0;
+          top: 0;
+      margin: 10px;
+      border-radius: 10px;
+      min-height: 200px;
+          }
                 
 </style>
 </head>
@@ -54,6 +54,8 @@ min-height: 200px;
   
   <script>
     var mymap; 
+    var lyrOSM;
+    var ctlZoomslider;
 
 
     $(document).ready(function(){
@@ -62,7 +64,7 @@ min-height: 200px;
       mymap.addLayer(lyrOSM);
       
       
-      ctlZoomslider = L.control.zoomslider({position:'topright'}).addTo(mymap);
+      //ctlZoomslider = L.control.zoomslider({position:'topright'}).addTo(mymap);
       
       var sidebar = L.control.sidebar('sidebar', {position: 'left'});
       mymap.addControl(sidebar);
@@ -80,10 +82,10 @@ min-height: 200px;
     // Skapar en yta med hörn över Borlänge - visuell figur 
     var polygon = L.polygon ([
       // Här ska vi fylla på med kordinater 
-      [],
-      [],
-      [],
-      []
+      [60.486, 15.430],
+      [60.487, 15.432],
+      [60.486, 15.434],
+      [60.485, 15.433]
     ], {
       //Exempel på stilinställningar
       color: 'blue',
@@ -92,9 +94,10 @@ min-height: 200px;
       // Lägger till polygonen på kartan 
     }).addTo(mymap);
 
+    //
     polygon.bindPopup(`
-      <h3>Borlänge</h3>
-      <img src="img/kupalen.jpg" "width=200px">
+      <h3>Kupolen</h3>
+      <img src="static/img/kupolen.avif" width="200px">
       
     `);
 
