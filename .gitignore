@@ -1,0 +1,16 @@
+# Ignorera virtual environment
+venv/
+
+# __pycache__ och tillfälliga filer
+__pycache__/
+*.pyc
+
+# VS Code-filer
+.vscode/
+
+# Mac OS-filer
+.DS_Store
+
+# Flask-relaterat (om du laddar upp sessions)
+instance/
+*.sqlite3
