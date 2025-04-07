@@ -1,110 +1,182 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Webmaps Group 15</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Webmaps Group 15 – Task 1</title>
 
-
-
+  <!-- ✅ Flask-korrekt sökväg till Leaflet CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='src/leaflet.css') }}">
-  <script src="{{ url_for('static', filename='src/jquery-3.6.0.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='src/leaflet.js') }}"></script>
-
-
-
-
-  
 
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
     #mapdiv {
-        height: 100vh;
-    }  
-    
+      height: 100vh;
+    }
+
     #side-bar {
       position: absolute;
       z-index: 1000;
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.85);
       padding: 10px;
       right: 0;
-          top: 0;
+      top: 0;
       margin: 10px;
       border-radius: 10px;
       min-height: 200px;
-          }
-                
-</style>
+      width: 160px;
+    }
+
+    .leaflet-popup-content img {
+      margin-top: 8px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    button {
+      width: 100%;
+      margin-bottom: 5px;
+    }
+  </style>
 </head>
 <body>
-  <div id="mapdiv" class="col-md-9"></div>
-       
-  <div id="side-bar" class="col-md-3"><h2>My Map</h2>
-       <button id="t1">Task 1</button>
-       <button id="t2">Task 2</button>
-       <button id="t3">Task 3</button>
-       <button id="t4">Task 4</button>
-       <button id="t5">Task 5</button>
-       <button id="t6">Task 6</button>
 
+  <!-- 🗺️ Karta -->
+  <div id="mapdiv"></div>
+
+  <!-- 📌 Sidebar med knappar -->
+  <div id="side-bar">
+    <h3>My Map</h3>
+    <button id="t1">Task 1</button>
+    <button id="t2">Task 2</button>
+    <button id="t3">Task 3</button>
+    <button id="t4">Task 4</button>
+    <button id="t5">Task 5</button>
+    <button id="t6">Task 6</button>
   </div>
-  
-  <div id="sidebar"><h1>leaflet-sidebar</h1>
-  </div>
-  
-  
+
+  <!-- ✅ Flask-korrekt sökvägar till JS -->
+  <script src="{{ url_for('static', filename='src/leaflet.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/jquery-3.6.0.js') }}"></script>
+
   <script>
-    var mymap; 
-    var lyrOSM;
-    var ctlZoomslider;
+    const mymap = L.map('mapdiv').setView([60.4887, 15.4214], 15);
 
-
-    $(document).ready(function(){
-      mymap = L.map('mapdiv', {center:[60.48868922712431, 15.421371459960938], zoom:13});
-      lyrOSM= L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
-      mymap.addLayer(lyrOSM);
-      
-      
-      //ctlZoomslider = L.control.zoomslider({position:'topright'}).addTo(mymap);
-      
-      var sidebar = L.control.sidebar('sidebar', {position: 'left'});
-      mymap.addControl(sidebar);
-
-    // Här ska vi fylla på med våra egna kordinater över borlänge. Varje par är en punkt på kartan
-    var latlngs = [
-					[60.48597441736927, 15.430247609393518],
-					[60.48459929622831, 15.43135458390195],
-					[60.48523356698502, 15.432368458869822]
-				];
-
-    // Skapar en linje mellan punkterna i latlngs
-    var polyline = L.polyline(latlngs, {color: 'red'}).addTo(mymap); 
-
-    // Skapar en yta med hörn över Borlänge - visuell figur 
-    var polygon = L.polygon ([
-      // Här ska vi fylla på med kordinater 
-      [60.486, 15.430],
-      [60.487, 15.432],
-      [60.486, 15.434],
-      [60.485, 15.433]
-    ], {
-      //Exempel på stilinställningar
-      color: 'blue',
-      fillColor: 'lightblue',
-      fillOpacity: 0.5
-      // Lägger till polygonen på kartan 
+    const lyrOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(mymap);
 
-    //
+    // Task 1
+    const taskone = L.layerGroup();
+
+    // 🔺 Linje
+    const latlngs = [
+      [60.48597, 15.43024],
+      [60.48459, 15.43135],
+      [60.48523, 15.43236]
+    ];
+    const polyline = L.polyline(latlngs, { color: 'red' });
+
+    // 🔷 Polygon
+    const polygon = L.polygon([
+    [60.485429367480435, 15.430118965081789],
+    [60.48441066854028, 15.428767579029966],
+    [60.483937403817805, 15.429956147485342],
+    [60.48490799012998, 15.431600605210491]
+  ], {
+    color: 'blue',
+    fillColor: 'lightblue',
+    fillOpacity: 0.5
+  })
+  
+ //  Punkt med ikon
+ const markerIcon = L.icon({
+      iconUrl: "{{ url_for('static', filename='map-marker.svg') }}",
+      iconSize: [32, 37],
+      iconAnchor: [16, 37],
+      popupAnchor: [0, -30]
+    });
+    
+    const marker = L.marker([60.484630287092585, 15.418267313673063], { icon: markerIcon })
+      .bindPopup("<b>Kupolen Köpcentrum</b><br><img src='{{ url_for('static', filename='img/kupolen.jpg') }}' width='150'>");
+
+    //  Popup med bild
     polygon.bindPopup(`
-      <h3>Kupolen</h3>
-      <img src="static/img/kupolen.avif" width="200px">
-      
-    `);
+    <h3>Liljeqvista Parken</h3>
+    <img src="{{ url_for('static', filename='img/liljeqvistaParken.jpg') }}" width="200px" />
+  `);
 
-    
-    
-  });
+      // ✅ Lägg till allt i layerGroup
+    taskone.addLayer(polyline);
+    taskone.addLayer(polygon);
+    taskone.addLayer(marker);
 
-  </script>  
+    // Toggle funktion
+    let taskoneActive = false;
+
+    // Knapp Task 1
+    document.getElementById("t1").addEventListener("click", () => {
+      if (taskoneActive) {
+        // Döljer lager för Task 1
+        taskone.removeFrom(mymap);
+        taskoneActive = false;
+      } else {
+        // Visar lager för Task 1
+        taskone.addTo(mymap);
+        taskoneActive = true;
+      }
+    });
+
+    // Skapa en shopping-ikon med Leaflets inbyggda markör-ikon
+    const schoolIcon = L.icon({
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png', // Standard Leaflet markör
+      iconSize: [25, 41], // Storlek på ikonen
+      iconAnchor: [12, 41], // Fästpunkt på ikonen
+      popupAnchor: [1, -34] // Popupens placering relativt ikonen
+    });
+    // Task 2 - Skolor
+    const taskTwoLayerGroup = L.layerGroup();
+
+    // Skoldata: Forssaklackskolan
+    const forssaklackCoords = [60.50492373000493, 15.429552425516595];
+    const forssaklackMarker = L.marker(forssaklackCoords, { icon: schoolIcon }).addTo(taskTwoLayerGroup);
+
+    // Skoldata: Hushagengymnasiet
+    const hushagenCoords = [60.49158216879865, 15.43550873063677];
+    const hushagenMarker = L.marker(hushagenCoords, { icon: schoolIcon }).addTo(taskTwoLayerGroup);
+
+    // Skoldata: Paradisskolan
+    const paradisskolanCoords = [60.493585196235195, 15.39327589685859];
+    const paradisskolanMarker = L.marker(paradisskolanCoords, { icon: schoolIcon }).addTo(taskTwoLayerGroup);
+
+    // Skoldata: Mjälgaskolan
+    const mjalgaskolanCoords = [60.48225896647882, 15.439705785534757];
+    const mjalgaskolanMarker = L.marker(mjalgaskolanCoords, { icon: schoolIcon }).addTo(taskTwoLayerGroup);
+
+    // Skoldata: Solängsskolan
+    const solangsskolanCoords = [60.49316172932379, 15.414390029127606];
+    const solangsskolanMarker = L.marker(solangsskolanCoords, { icon: schoolIcon }).addTo(taskTwoLayerGroup);
+
+    // Task 2 - Funktion för att visa/dölja lager
+    let taskTwoActive = false;
+
+    document.getElementById("t2").addEventListener("click", () => {
+      if (taskTwoActive) {
+        // Döljer lager för Task 2
+        taskTwoLayerGroup.removeFrom(mymap);
+        taskTwoActive = false;
+      } else {
+        // Visar lager för Task 2
+        taskTwoLayerGroup.addTo(mymap);
+        taskTwoActive = true;
+      }
+    });
+
+  </script>
 </body>
 </html>
