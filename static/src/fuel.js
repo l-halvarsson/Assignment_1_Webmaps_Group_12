@@ -1,4 +1,4 @@
-{
+var fuel = {
 "type": "FeatureCollection",
 "name": "fuel",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },

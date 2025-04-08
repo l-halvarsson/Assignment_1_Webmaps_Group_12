@@ -5,8 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Webmaps Group 15 – Task 1</title>
 
-  <!-- ✅ Flask-korrekt sökväg till Leaflet CSS -->
+  <!-- Flask-korrekt sökväg till Leaflet CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='src/leaflet.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='src/plugins/L.Control.Sidebar.css') }}">
+  <!-- Leaflet Sidebar CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.min.css" /> <!-- Task 2 -->
+
+   <!-- Leaflet Sidebar JS -->
+   <script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.min.js"></script>
+  <!-- TEST -->
+  <link rel="stylesheet" href="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css" />
+  <script src="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
+
+
+  
+
+  <!-- Flask-korrekt sökvägar till JS -->
+  <script src="{{ url_for('static', filename='src/leaflet.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/jquery-3.6.0.js') }}"></script>
+  <script src="{{ url_for('static', filename='src/plugins/L.Control.Sidebar.js') }}"></script> <!-- Task 2 -->
+  <script src="{{ url_for('static', filename='src/fuel.js') }}"></script> <!-- Task 5-->
+  <script src="{{ url_for('static', filename='src/supermarket.js') }}"></script> <!-- Task 3-->
+  <script src="{{ url_for('static', filename='src/turf.min.js') }}"></script> <!-- Task 3 -->
+ 
+ 
+
+
+  
+
 
   <style>
     html, body {
@@ -46,23 +72,48 @@
 </head>
 <body>
 
-  <!-- 🗺️ Karta -->
+  <!-- Karta -->
   <div id="mapdiv"></div>
 
-  <!-- 📌 Sidebar med knappar -->
-  <div id="side-bar">
+  <!-- Sidebar för skolor -->
+   <!-- 📚 Sidebar container -->
+<div id="sidebar" class="leaflet-sidebar collapsed">
+
+  <!-- Tab ikoner -->
+  <div class="leaflet-sidebar-tabs">
+    <ul role="tablist">
+      <li><a href="#home" role="tab"><i class="fa fa-info"></i></a></li>
+    </ul>
+  </div>
+
+  <!-- Innehåll -->
+  <div class="leaflet-sidebar-content">
+    <div class="leaflet-sidebar-pane" id="home">
+      <h1 class="leaflet-sidebar-header">
+        Information
+        <span class="leaflet-sidebar-close"><i class="fa fa-times"></i></span>
+      </h1>
+      <div id="sidebar-content">
+        <!-- Skolinformation hamnar här -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <!-- Sidebar med knappar -->
+  
     <h3>My Map</h3>
+    <div id="side-bar">
     <button id="t1">Task 1</button>
     <button id="t2">Task 2</button>
     <button id="t3">Task 3</button>
     <button id="t4">Task 4</button>
     <button id="t5">Task 5</button>
     <button id="t6">Task 6</button>
+    <button id="t7">Task 7</button>
   </div>
-
-  <!-- ✅ Flask-korrekt sökvägar till JS -->
-  <script src="{{ url_for('static', filename='src/leaflet.js') }}"></script>
-  <script src="{{ url_for('static', filename='src/jquery-3.6.0.js') }}"></script>
 
   <script>
     const mymap = L.map('mapdiv').setView([60.4887, 15.4214], 15);
@@ -70,19 +121,40 @@
     const lyrOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(mymap);
+    
 
-    // Task 1
+    //TEST
+    const polylineMeasure = L.control.polylineMeasure({
+      position: 'bottomright',
+      showBearings: true,
+      unit: 'metres',
+      clearMeasurementsOnStop: false,
+      showClearControl: true
+    }).addTo(mymap);
+
+
+    // Skapa sidopanelen
+    const sidebar = L.control.sidebar({
+      autopan: true,
+      container: 'sidebar',
+      position: 'left'
+    }).addTo(mymap);
+
+  
+
+
+
+    // --------------- Task 1 --------------- //
     const taskone = L.layerGroup();
+    let taskoneActive = false;
 
-    // 🔺 Linje
+    // Linje
     const latlngs = [
-      [60.48597, 15.43024],
-      [60.48459, 15.43135],
-      [60.48523, 15.43236]
+      [60.485849, 15.430558],
+      [60.485408, 15.432103]
     ];
-    const polyline = L.polyline(latlngs, { color: 'red' });
-
-    // 🔷 Polygon
+    const polyline = L.polyline(latlngs, { color: 'red' }) .bindPopup("<b>Bussgatan</b><br><img src='{{ url_for('static', filename='img/bussgatan.jpg') }}' width='300'>");
+    // Polygon
     const polygon = L.polygon([
     [60.485429367480435, 15.430118965081789],
     [60.48441066854028, 15.428767579029966],
@@ -93,31 +165,39 @@
     fillColor: 'lightblue',
     fillOpacity: 0.5
   })
+    //  Popup med bild för polygon
+  polygon.bindPopup(`
+  <h3>Liljeqvista Parken</h3>
+  <img src="{{ url_for('static', filename='img/liljeqvistaParken.jpg') }}" width="300px" />
+  `);
   
- //  Punkt med ikon
- const markerIcon = L.icon({
-      iconUrl: "{{ url_for('static', filename='map-marker.svg') }}",
+  
+//  Punkt med ikon
+const markerIcon = L.icon({
+  iconUrl: "{{ url_for('static', filename='img/shoppingCart.png') }}",
       iconSize: [32, 37],
       iconAnchor: [16, 37],
       popupAnchor: [0, -30]
     });
     
-    const marker = L.marker([60.484630287092585, 15.418267313673063], { icon: markerIcon })
+const marker = L.marker([60.484630287092585, 15.418267313673063], { icon: markerIcon })
       .bindPopup("<b>Kupolen Köpcentrum</b><br><img src='{{ url_for('static', filename='img/kupolen.jpg') }}' width='150'>");
 
-    //  Popup med bild
-    polygon.bindPopup(`
-    <h3>Liljeqvista Parken</h3>
-    <img src="{{ url_for('static', filename='img/liljeqvistaParken.jpg') }}" width="200px" />
-  `);
+      // Skapa en shopping-ikon med Leaflets inbyggda markör-ikon
+    const schoolIcon = L.icon({
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png', // Standard Leaflet markör
+      iconSize: [25, 41], // Storlek på ikonen
+      iconAnchor: [12, 41], // Fästpunkt på ikonen
+      popupAnchor: [1, -34] // Popupens placering relativt ikonen
+    });
 
-      // ✅ Lägg till allt i layerGroup
+
+      // Lägg till allt i layerGroup
     taskone.addLayer(polyline);
     taskone.addLayer(polygon);
     taskone.addLayer(marker);
-
-    // Toggle funktion
-    let taskoneActive = false;
+    taskone.addLayer(markerIcon);
+    
 
     // Knapp Task 1
     document.getElementById("t1").addEventListener("click", () => {
@@ -132,15 +212,25 @@
       }
     });
 
-    // Skapa en shopping-ikon med Leaflets inbyggda markör-ikon
-    const schoolIcon = L.icon({
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png', // Standard Leaflet markör
-      iconSize: [25, 41], // Storlek på ikonen
-      iconAnchor: [12, 41], // Fästpunkt på ikonen
-      popupAnchor: [1, -34] // Popupens placering relativt ikonen
-    });
-    // Task 2 - Skolor
+
+
+    // ---------------  Task 2 - Skolor --------------- //
+
     const taskTwoLayerGroup = L.layerGroup();
+
+    let taskTwoActive = false;
+
+    document.getElementById("t2").addEventListener("click", () => {
+      if (taskTwoActive) {
+        // Döljer lager för Task 2
+        taskTwoLayerGroup.removeFrom(mymap);
+        taskTwoActive = false;
+      } else {
+        // Visar lager för Task 2
+        taskTwoLayerGroup.addTo(mymap);
+        taskTwoActive = true;
+      }
+    });
 
     // Skoldata: Forssaklackskolan
     const forssaklackCoords = [60.50492373000493, 15.429552425516595];
@@ -162,20 +252,208 @@
     const solangsskolanCoords = [60.49316172932379, 15.414390029127606];
     const solangsskolanMarker = L.marker(solangsskolanCoords, { icon: schoolIcon }).addTo(taskTwoLayerGroup);
 
-    // Task 2 - Funktion för att visa/dölja lager
-    let taskTwoActive = false;
+   
 
-    document.getElementById("t2").addEventListener("click", () => {
-      if (taskTwoActive) {
-        // Döljer lager för Task 2
-        taskTwoLayerGroup.removeFrom(mymap);
-        taskTwoActive = false;
-      } else {
-        // Visar lager för Task 2
-        taskTwoLayerGroup.addTo(mymap);
-        taskTwoActive = true;
+    forssaklackMarker.on("click", function() {
+      document.getElementById("sidebar-content").innerHTML = `
+      <h2>Forssaklackskolan</h2>
+      <p>Forssaklackskolan är en stor och livlig högstadieskola i Borlänge som erbjuder 
+        undervisning för årskurs 7 till 9. Skolan är särskilt känd för sina profiler inom idrott, 
+        teknik och musik, vilket ger eleverna möjlighet att utveckla sina intressen både praktiskt 
+        och teoretiskt. Med moderna klassrum, idrottshall, musikstudio och verkstäder ger 
+        Forssaklackskolan eleverna en varierad och inspirerande skoldag. Det råder en stark gemenskap 
+        mellan elever och personal, och skolan arbetar aktivt för en trygg och inkluderande miljö.</p>
+    `;
+    sidebar.open('home'); // visar fliken med ID "home"
+    });
+
+    hushagenMarker.on("click", function() {
+      document.getElementById("sidebar-content").innerHTML = `
+      <h2>Hushagsgymnasiet</h2>
+      <p>Hushagengymnasiet är en modern gymnasieskola i Borlänge med fokus på praktiska utbildningar. 
+        Skolan erbjuder yrkesprogram inom bygg, el, fordon och industri, och har nära samarbete med det 
+        lokala näringslivet. Här kombineras klassrumsundervisning med praktik ute på arbetsplatser 
+        för att ge eleverna en stark förankring i arbetslivet. Skolan är känd för sin gemenskap, 
+        engagerade lärare och välutrustade verkstäder.</p>
+    `;
+    sidebar.open('home'); // visar fliken med ID "home"
+    });
+
+    paradisskolanMarker.on("click", function() {
+      document.getElementById("sidebar-content").innerHTML = `
+      <h2>Paradisskolan</h2>
+      <p>Paradisskolan är en trivsam grundskola belägen i ett lugnt bostadsområde i Borlänge. 
+        Skolan har elever från förskoleklass till årskurs 6 och satsar mycket på trygghet, 
+        kreativitet och lärande genom lek. Här finns både en stor skolgård med plats för lek och 
+        rörelse, samt nyrenoverade klassrum med modern teknik. Paradisskolan arbetar aktivt med 
+        värdegrundsarbete och har flera temadagar under året för att stärka sammanhållningen.</p>
+    `;
+    sidebar.open('home'); // visar fliken med ID "home"
+    });
+
+    mjalgaskolanMarker.on("click", function() {
+      document.getElementById("sidebar-content").innerHTML = `
+      <h2>Mjälgaskolan</h2>
+      <p>Mjälgaskolan är en mångsidig grundskola i södra Borlänge med årskurser från F–9. 
+        Skolan är känd för sitt engagemang i hållbarhetsfrågor och sitt arbete med elevinflytande. 
+        Med ett brett utbud av aktiviteter både under och efter skoltid, skapas en inkluderande miljö 
+        där alla elever ges möjlighet att växa. Skolan har ett bibliotek, moderna NO-salar och ett 
+        aktivt elevråd som påverkar skolans utveckling.</p>
+    `;
+    sidebar.open('home'); // visar fliken med ID "home"
+    });
+
+    solangsskolanMarker.on("click", function() {
+      document.getElementById("sidebar-content").innerHTML = `
+      <h2>Solängsskolan</h2>
+      <p>Solängsskolan är en lugn och familjär skola i centrala Borlänge, med fokus på låg- och 
+        mellanstadieelever. Här står trygghet, lärglädje och natur nära hjärtat. Skolan har en 
+        grön utemiljö med plats för både lek och undervisning utomhus, samt engagerade pedagoger 
+        som arbetar tematiskt för att stimulera nyfikenhet och kreativitet. Solängsskolan har också 
+        ett starkt fokus på läsning, och varje vecka hålls gemensamma lässtunder i skolans mysiga 
+        bibliotek.</p>
+    `;
+    sidebar.open('home'); // visar fliken med ID "home"
+    });
+  
+
+    const schoolLine = [
+    { lat: 60.50492, lng: 15.42955 },
+    { lat: 60.49158, lng: 15.43550 },
+    { lat: 60.49358, lng: 15.39327 },
+    { lat: 60.48226, lng: 15.43970 },
+    { lat: 60.49316, lng: 15.41439 }
+  ];
+
+polylineMeasure.seed([schoolLine]);
+
+
+    // --------------- Task 3 --------------- //
+    
+    const taskThree = L.layerGroup();
+    let taskThreeActive = false;
+    
+    // Skapa supermarket markers
+    const superMarkers = L.geoJSON(supermarket, {
+      pointToLayer: function (feature, latlng) {
+        return L.marker(latlng);
+      },
+      onEachFeature: function (feature, layer) {
+        const name = feature.properties.name || "Okänd butik";
+        layer.bindPopup(`<b>${name}</b>`);
       }
     });
+    taskThree.addLayer(superMarkers);
+    
+    // Buffra varje supermarketpunkt med Turf.js
+    const bufferedFeatures = supermarket.features.map(feature => {
+      return turf.buffer(feature, 1, { units: 'kilometers' });
+    });
+    
+    const bufferGeoJSON = {
+      type: "FeatureCollection",
+      features: bufferedFeatures
+    };
+    
+    const bufferLayer = L.geoJSON(bufferGeoJSON, {
+      style: {
+        color: "green",
+        fillColor: "lightgreen",
+        fillOpacity: 0.4
+      }
+    });
+    taskThree.addLayer(bufferLayer);
+    
+    // Identifiera icke-överlappande butiker
+    const nonOverlapping = [];
+    
+    for (let i = 0; i < bufferedFeatures.length; i++) {
+      const thisFeature = bufferedFeatures[i];
+      let overlaps = false;
+    
+      for (let j = 0; j < bufferedFeatures.length; j++) {
+        if (i !== j) {
+          const otherFeature = bufferedFeatures[j];
+          if (turf.booleanOverlap(thisFeature, otherFeature)) {
+            overlaps = true;
+            break;
+          }
+        }
+      }
+    
+      if (!overlaps) {
+        nonOverlapping.push(supermarket.features[i]);
+      }
+    }
+    
+    // Visa icke-överlappande som röda cirklar
+    const nonOverlapLayer = L.geoJSON(nonOverlapping, {
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, {
+          radius: 8,
+          fillColor: "red",
+          color: "#900",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        });
+      },
+      onEachFeature: function (feature, layer) {
+        const name = feature.properties.name || "Okänd butik";
+        layer.bindPopup(" Ej överlappande:<br><b>" + name + "</b>");
+      }
+    });
+    taskThree.addLayer(nonOverlapLayer);
+    
+    // Toggle-knapp Task 3
+    document.getElementById("t3").addEventListener("click", () => {
+      if (taskThreeActive) {
+        taskThree.removeFrom(mymap);
+        taskThreeActive = false;
+      } else {
+        taskThree.addTo(mymap);
+        taskThreeActive = true;
+      }
+    });
+
+
+
+
+
+    // --------------- Task 4 --------------- //
+    const taskFourLayerGroup = L.layerGroup();
+
+    const imgUrl = "{{ url_for('static', filename='img/ikea.jpg') }}";
+    const imgBounds = [
+      [60.48241710224994, 15.420601630956583], //Nordvästra hörnet
+      [60.480762970810034, 15.422010398374436] // Sydöstra hörnet
+    ];
+
+    const ikeaOverlay = L.imageOverlay(imgUrl, imgBounds, { opacity: 0.8 }); 
+    
+    taskFourLayerGroup.addLayer(ikeaOverlay);
+
+    let taskFourActive = false;
+    document.getElementById("t4").addEventListener("click", () => {
+      if (taskFourActive) {
+        taskFourLayerGroup.removeFrom(mymap);
+        taskFourActive = false;
+      } else {
+        taskFourLayerGroup.addTo(mymap);
+        taskFourActive = true;
+      }
+    });
+
+    
+
+
+
+    // --------------- Task 5 --------------- //
+
+    // --------------- Task 6 --------------- //
+
+    // --------------- Task 7 --------------- //
+
 
   </script>
 </body>
