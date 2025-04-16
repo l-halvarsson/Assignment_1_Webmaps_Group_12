@@ -8,7 +8,7 @@
   <script src="{{ url_for('static', filename='src/leaflet.js') }}"></script>
   <!-- Flask-korrekt sökväg till Leaflet CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='src/leaflet.css') }}">
-  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='src/plugins/L.Control.Sidebar.css') }}"> TESTAR GÖRA OM-->
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='src/plugins/L.Control.Sidebar.css') }}"> TESTAR TA BORT-->
   <!-- Leaflet Sidebar CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.min.css" /> <!-- Task 2 -->python -m venv venv
 
@@ -126,13 +126,13 @@
     }).addTo(mymap);
     
      //TEST
-     const polylineMeasure = L.control.polylineMeasure({
-      position: 'bottomright',
-      showBearings: true,
-      unit: 'metres',
-      clearMeasurementsOnStop: false,
-      showClearControl: true
-    }).addTo(mymap);
+     //const polylineMeasure = L.control.polylineMeasure({
+     // position: 'bottomright',
+     // showBearings: true,
+     // unit: 'metres',
+     // clearMeasurementsOnStop: false,
+     // showClearControl: true
+   // }).addTo(mymap);
 
 
     // Skapa sidopanelen
@@ -216,24 +216,44 @@ const marker = L.marker([60.484630287092585, 15.418267313673063], { icon: marker
 
 
 
-    // ---------------  Task 2 - Skolor --------------- //
+// ---------------  Task 2 - Skolor --------------- //
+const taskTwoLayerGroup = L.layerGroup();
+let taskTwoActive = false;
+let polylineMeasureControl;
 
-    const taskTwoLayerGroup = L.layerGroup();
+// RÄTT format för seed()
+const schoolLine = [
+  { lat: 60.50492, lng: 15.42955 },
+  { lat: 60.49158, lng: 15.43550 },
+  { lat: 60.49358, lng: 15.39327 },
+  { lat: 60.48226, lng: 15.43970 },
+  { lat: 60.49316, lng: 15.41439 }
+];
 
-    let taskTwoActive = false;
-  
+document.getElementById("t2").addEventListener("click", () => {
+  if (taskTwoActive) {
+    taskTwoLayerGroup.removeFrom(mymap);
+    if (polylineMeasureControl) {
+      mymap.removeControl(polylineMeasureControl);
+    }
+    taskTwoActive = false;
+  } else {
+    taskTwoLayerGroup.addTo(mymap);
+    polylineMeasureControl = L.control.polylineMeasure({
+      position: 'bottomright',
+      showBearings: true,
+      unit: 'metres',
+      clearMeasurementsOnStop: false,
+      showClearControl: true
+    }).addTo(mymap);
 
-    document.getElementById("t2").addEventListener("click", () => {
-      if (taskTwoActive) {
-        // Döljer lager för Task 2
-        taskTwoLayerGroup.removeFrom(mymap);
-        taskTwoActive = false;
-      } else {
-        // Visar lager för Task 2
-        taskTwoLayerGroup.addTo(mymap);
-        taskTwoActive = true;
-      }
-    });
+    // 👇 Viktigt! Visa linjen direkt:
+    polylineMeasureControl.seed([schoolLine]);
+
+    taskTwoActive = true;
+  }
+});
+
 
 
     // Skoldata: Forssaklackskolan
@@ -321,15 +341,15 @@ const marker = L.marker([60.484630287092585, 15.418267313673063], { icon: marker
     });
   
 
-    const schoolLine = [
-    { lat: 60.50492, lng: 15.42955 },
-    { lat: 60.49158, lng: 15.43550 },
-    { lat: 60.49358, lng: 15.39327 },
-    { lat: 60.48226, lng: 15.43970 },
-    { lat: 60.49316, lng: 15.41439 }
-  ];
+  //  const schoolLine = [
+  //  { lat: 60.50492, lng: 15.42955 },
+  //  { lat: 60.49158, lng: 15.43550 },
+  //  { lat: 60.49358, lng: 15.39327 },
+  //  { lat: 60.48226, lng: 15.43970 },
+  //  { lat: 60.49316, lng: 15.41439 }
+  //];
 
-polylineMeasure.seed([schoolLine]);
+//polylineMeasure.seed([schoolLine]);
 
 
     // --------------- Task 3 --------------- //
