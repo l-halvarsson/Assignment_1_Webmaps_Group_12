@@ -30,6 +30,13 @@
   <script src="{{ url_for('static', filename='src/fuel.js') }}"></script> <!-- Task 5-->
   <script src="{{ url_for('static', filename='src/supermarket.js') }}"></script> <!-- Task 3-->
   <script src="{{ url_for('static', filename='src/turf.min.js') }}"></script> <!-- Task 3 -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script> <!--k-mean-->
+  <script src="https://cdn.jsdelivr.net/npm/ml-kmeans@4.1.1/dist/ml-kmeans.min.js"></script> <!--k-mean-->
+
+
+
+
  
  
 
@@ -221,7 +228,6 @@ const taskTwoLayerGroup = L.layerGroup();
 let taskTwoActive = false;
 let polylineMeasureControl;
 
-// RÄTT format för seed()
 const schoolLine = [
   { lat: 60.50492, lng: 15.42955 },
   { lat: 60.49158, lng: 15.43550 },
@@ -234,6 +240,7 @@ document.getElementById("t2").addEventListener("click", () => {
   if (taskTwoActive) {
     taskTwoLayerGroup.removeFrom(mymap);
     if (polylineMeasureControl) {
+      
       mymap.removeControl(polylineMeasureControl);
     }
     taskTwoActive = false;
@@ -247,7 +254,7 @@ document.getElementById("t2").addEventListener("click", () => {
       showClearControl: true
     }).addTo(mymap);
 
-    // 👇 Viktigt! Visa linjen direkt:
+   
     polylineMeasureControl.seed([schoolLine]);
 
     taskTwoActive = true;
@@ -339,17 +346,6 @@ document.getElementById("t2").addEventListener("click", () => {
     `;
     sidebar.open('home'); // visar fliken med ID "home"
     });
-  
-
-  //  const schoolLine = [
-  //  { lat: 60.50492, lng: 15.42955 },
-  //  { lat: 60.49158, lng: 15.43550 },
-  //  { lat: 60.49358, lng: 15.39327 },
-  //  { lat: 60.48226, lng: 15.43970 },
-  //  { lat: 60.49316, lng: 15.41439 }
-  //];
-
-//polylineMeasure.seed([schoolLine]);
 
 
     // --------------- Task 3 --------------- //
@@ -612,6 +608,7 @@ document.getElementById("t2").addEventListener("click", () => {
     
 
     // --------------- Task 7 --------------- //
+   
 
 
   </script>
