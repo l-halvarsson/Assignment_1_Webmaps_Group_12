@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Webmaps Group 15 – Task 1</title>
 
+  <script src="{{ url_for('static', filename='src/leaflet.js') }}"></script>
   <!-- Flask-korrekt sökväg till Leaflet CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='src/leaflet.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='src/plugins/L.Control.Sidebar.css') }}">
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='src/plugins/L.Control.Sidebar.css') }}"> TESTAR GÖRA OM-->
   <!-- Leaflet Sidebar CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.min.css" /> <!-- Task 2 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.min.css" /> <!-- Task 2 -->python -m venv venv
 
    <!-- Leaflet Sidebar JS -->
    <script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.min.js"></script>
@@ -17,13 +18,15 @@
   <link rel="stylesheet" href="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css" />
   <script src="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
 
-
-  
+  <!-- MarkerCluster CSS för uppgift 5 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <!-- MarkerCluster JS för uppgift 5-->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
   <!-- Flask-korrekt sökvägar till JS -->
-  <script src="{{ url_for('static', filename='src/leaflet.js') }}"></script>
   <script src="{{ url_for('static', filename='src/jquery-3.6.0.js') }}"></script>
-  <script src="{{ url_for('static', filename='src/plugins/L.Control.Sidebar.js') }}"></script> <!-- Task 2 -->
+  <!--<script src="{{ url_for('static', filename='src/plugins/L.Control.Sidebar.js') }}"></script> TESTAR GÖRA OM--><!-- Task 2 -->
   <script src="{{ url_for('static', filename='src/fuel.js') }}"></script> <!-- Task 5-->
   <script src="{{ url_for('static', filename='src/supermarket.js') }}"></script> <!-- Task 3-->
   <script src="{{ url_for('static', filename='src/turf.min.js') }}"></script> <!-- Task 3 -->
@@ -122,9 +125,8 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(mymap);
     
-
-    //TEST
-    const polylineMeasure = L.control.polylineMeasure({
+     //TEST
+     const polylineMeasure = L.control.polylineMeasure({
       position: 'bottomright',
       showBearings: true,
       unit: 'metres',
@@ -219,6 +221,7 @@ const marker = L.marker([60.484630287092585, 15.418267313673063], { icon: marker
     const taskTwoLayerGroup = L.layerGroup();
 
     let taskTwoActive = false;
+  
 
     document.getElementById("t2").addEventListener("click", () => {
       if (taskTwoActive) {
@@ -231,6 +234,7 @@ const marker = L.marker([60.484630287092585, 15.418267313673063], { icon: marker
         taskTwoActive = true;
       }
     });
+
 
     // Skoldata: Forssaklackskolan
     const forssaklackCoords = [60.50492373000493, 15.429552425516595];
@@ -329,14 +333,21 @@ polylineMeasure.seed([schoolLine]);
 
 
     // --------------- Task 3 --------------- //
-    
+
     const taskThree = L.layerGroup();
     let taskThreeActive = false;
-    
-    // Skapa supermarket markers
+
+    // Skapa supermarket markers utan bilder (circleMarker istället för marker)
     const superMarkers = L.geoJSON(supermarket, {
       pointToLayer: function (feature, latlng) {
-        return L.marker(latlng);
+        return L.circleMarker(latlng, {
+          radius: 6,
+          fillColor: "blue",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.7
+        });
       },
       onEachFeature: function (feature, layer) {
         const name = feature.properties.name || "Okänd butik";
@@ -344,17 +355,17 @@ polylineMeasure.seed([schoolLine]);
       }
     });
     taskThree.addLayer(superMarkers);
-    
+
     // Buffra varje supermarketpunkt med Turf.js
     const bufferedFeatures = supermarket.features.map(feature => {
       return turf.buffer(feature, 1, { units: 'kilometers' });
     });
-    
+
     const bufferGeoJSON = {
       type: "FeatureCollection",
       features: bufferedFeatures
     };
-    
+
     const bufferLayer = L.geoJSON(bufferGeoJSON, {
       style: {
         color: "green",
@@ -363,14 +374,14 @@ polylineMeasure.seed([schoolLine]);
       }
     });
     taskThree.addLayer(bufferLayer);
-    
+
     // Identifiera icke-överlappande butiker
     const nonOverlapping = [];
-    
+
     for (let i = 0; i < bufferedFeatures.length; i++) {
       const thisFeature = bufferedFeatures[i];
       let overlaps = false;
-    
+
       for (let j = 0; j < bufferedFeatures.length; j++) {
         if (i !== j) {
           const otherFeature = bufferedFeatures[j];
@@ -380,12 +391,12 @@ polylineMeasure.seed([schoolLine]);
           }
         }
       }
-    
+
       if (!overlaps) {
         nonOverlapping.push(supermarket.features[i]);
       }
     }
-    
+
     // Visa icke-överlappande som röda cirklar
     const nonOverlapLayer = L.geoJSON(nonOverlapping, {
       pointToLayer: function (feature, latlng) {
@@ -404,7 +415,7 @@ polylineMeasure.seed([schoolLine]);
       }
     });
     taskThree.addLayer(nonOverlapLayer);
-    
+
     // Toggle-knapp Task 3
     document.getElementById("t3").addEventListener("click", () => {
       if (taskThreeActive) {
@@ -415,8 +426,6 @@ polylineMeasure.seed([schoolLine]);
         taskThreeActive = true;
       }
     });
-
-
 
 
 
@@ -450,7 +459,137 @@ polylineMeasure.seed([schoolLine]);
 
     // --------------- Task 5 --------------- //
 
+    /*
+    const taskFiveLayerGroup = L.layerGroup();
+    let taskFiveActive = false;
+    const fuelCluster = L.markerClusterGroup() // Skapa en markerClusterGroup för bränslestationer
+    const fuelMarkers = L.geoJSON(fuel, {
+      pointToLayer: function (feature, latlng) {
+        return L.marker(latlng, {
+          icon: L.icon({
+            iconUrl: "{{ url_for('static', filename='img/fuel.png') }}",
+            iconSize: [32, 37],
+            iconAnchor: [16, 37],
+            popupAnchor: [0, -30]
+          })
+        });
+      },
+      onEachFeature: function (feature, layer) {
+        const name = feature.properties.name || "Okänd station";
+        layer.bindPopup(`<b>${name}</b>`);
+      }
+    });
+    
+    fuelCluster.addLayer(fuelMarkers); // Lägg till bränslestationer i cluster
+    taskFiveLayerGroup.addLayer(fuelCluster); // Lägg till cluster i lagergruppen
+    
+
+    document.getElementById("t5").addEventListener("click", () => {
+      if (taskFiveActive) {
+        taskFiveLayerGroup.removeFrom(mymap);
+        taskFiveActive = false;
+      } else {
+        taskFiveLayerGroup.addTo(mymap);
+        taskFiveActive = true;
+      }
+    });
+
+    */
     // --------------- Task 6 --------------- //
+    const taskSix = L.layerGroup();
+    let taskSixActive = false;
+    
+    // Lista över städer
+    const cities = [
+      { name: "Stockholm", coords: [59.3293, 18.0686] },
+      { name: "Göteborg", coords: [57.7089, 11.9746] },
+      { name: "Malmö", coords: [55.604981, 13.003822] },
+      { name: "Uppsala", coords: [59.8586, 17.6389] },
+      { name: "Borlänge", coords: [60.4840, 15.4371] }
+    ];
+    
+    // Funktion som hämtar väder för en stad
+    function getWeatherInfo(cityObj) {
+      console.log("Hämtar väder för:", cityObj.name); // Debug
+    
+      fetch(`/weather?city=${cityObj.name}`)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`❌ API-anrop misslyckades för ${cityObj.name}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log("Mottagen data:", data); // Debug
+    
+          const current = data.current;
+          const forecastList = data.forecast?.list?.slice(0, 3) || [];
+    
+          // Skapa popup-innehåll
+          const popupContent = `
+            <b>${cityObj.name}</b><br>
+            Temp: ${current.main.temp} °C<br>
+            Väder: ${current.weather[0].description}<br>
+            <small><i>Prognos:</i><br>
+            ${forecastList.map(f => `${f.dt_txt.split(" ")[1]}: ${f.main.temp}°C, ${f.weather[0].main}`).join("<br>")}
+            </small>
+          `;
+    
+          // Skapa markör med popup
+          const defaultIcon = L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          });
+          
+          const marker = L.marker(cityObj.coords, { icon: defaultIcon }).bindPopup(popupContent);
+          
+    
+          // Klick öppnar väder i sidopanel
+          marker.on("click", () => {
+            document.getElementById("sidebar-content").innerHTML = `
+              <h2>${cityObj.name}</h2>
+              <p><b>Nuvarande väder:</b><br>
+              Temperatur: ${current.main.temp} °C<br>
+              Vind: ${current.wind.speed} m/s<br>
+              Luftfuktighet: ${current.main.humidity}%<br>
+              Väder: ${current.weather[0].description}</p>
+    
+              ${forecastList.length > 0 ? `
+                <h4>Prognos</h4>
+                ${forecastList.map(f => `
+                  <p>${f.dt_txt}<br>
+                  Temp: ${f.main.temp}°C – ${f.weather[0].main}</p>
+                `).join("")}
+              ` : "<p><i>Ingen prognos tillgänglig</i></p>"}
+            `;
+            sidebar.open('home');
+          });
+    
+          taskSix.addLayer(marker);
+        })
+        .catch(error => {
+          console.error("❗ Fel vid väderhämtning:", error);
+          alert("Kunde inte hämta väderdata för " + cityObj.name);
+        });
+    }
+    
+    // Toggle-knapp Task 6
+    document.getElementById("t6").addEventListener("click", () => {
+      if (taskSixActive) {
+        taskSix.removeFrom(mymap);
+        taskSixActive = false;
+      } else {
+        taskSix.clearLayers(); // rensa gamla markörer om någon redan finns
+        cities.forEach(city => getWeatherInfo(city));
+        taskSix.addTo(mymap);
+        taskSixActive = true;
+      }
+    });
+    
 
     // --------------- Task 7 --------------- //
 
