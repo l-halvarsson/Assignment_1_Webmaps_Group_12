@@ -14,7 +14,7 @@
 
    <!-- Leaflet Sidebar JS -->
    <script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.min.js"></script>
-  <!-- TEST -->
+  <!-- polylineMeasure -->
   <link rel="stylesheet" href="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css" />
   <script src="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
 
@@ -29,19 +29,9 @@
   <!--<script src="{{ url_for('static', filename='src/plugins/L.Control.Sidebar.js') }}"></script> TESTAR GÖRA OM--><!-- Task 2 -->
   <script src="{{ url_for('static', filename='src/fuel.js') }}"></script> <!-- Task 5-->
   <script src="{{ url_for('static', filename='src/supermarket.js') }}"></script> <!-- Task 3-->
-  <script src="{{ url_for('static', filename='src/turf.min.js') }}"></script> <!-- Task 3 -->
+  <script src="{{ url_for('static', filename='src/turf.min.js') }}"></script> <!-- Task 3 & Task 7 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script> <!--Task 7, k-mean-->
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script> <!--k-mean-->
-  <script src="https://cdn.jsdelivr.net/npm/ml-kmeans@4.1.1/dist/ml-kmeans.min.js"></script> <!--k-mean-->
-
-
-
-
- 
- 
-
-
-  
 
 
   <style>
@@ -115,7 +105,7 @@
   <!-- Sidebar med knappar -->
   
     <h3>My Map</h3>
-    <div id="side-bar">
+  <div id="side-bar">
     <button id="t1">Task 1</button>
     <button id="t2">Task 2</button>
     <button id="t3">Task 3</button>
@@ -126,22 +116,22 @@
   </div>
 
   <script>
+    // Skapa markör med popup
+    const defaultIcon = L.icon({
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
     const mymap = L.map('mapdiv').setView([60.4887, 15.4214], 15);
 
     const lyrOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(mymap);
     
-     //TEST
-     //const polylineMeasure = L.control.polylineMeasure({
-     // position: 'bottomright',
-     // showBearings: true,
-     // unit: 'metres',
-     // clearMeasurementsOnStop: false,
-     // showClearControl: true
-   // }).addTo(mymap);
-
-
+    
     // Skapa sidopanelen
     const sidebar = L.control.sidebar({
       autopan: true,
@@ -151,10 +141,8 @@
 
   
 
-
-
     // --------------- Task 1 --------------- //
-    const taskone = L.layerGroup();
+    const taskOneLayerGroup = L.layerGroup();
     let taskoneActive = false;
 
     // Linje
@@ -169,54 +157,54 @@
     [60.48441066854028, 15.428767579029966],
     [60.483937403817805, 15.429956147485342],
     [60.48490799012998, 15.431600605210491]
-  ], {
-    color: 'blue',
-    fillColor: 'lightblue',
-    fillOpacity: 0.5
-  })
+    ], {
+      color: 'blue',
+      fillColor: 'lightblue',
+      fillOpacity: 0.5
+    })
     //  Popup med bild för polygon
-  polygon.bindPopup(`
-  <h3>Liljeqvista Parken</h3>
-  <img src="{{ url_for('static', filename='img/liljeqvistaParken.jpg') }}" width="300px" />
-  `);
+    polygon.bindPopup(`
+    <h3>Liljeqvista Parken</h3>
+    <img src="{{ url_for('static', filename='img/liljeqvistaParken.jpg') }}" width="300px" />
+    `);
   
   
-//  Punkt med ikon
-const markerIcon = L.icon({
-  iconUrl: "{{ url_for('static', filename='img/shoppingCart.png') }}",
-      iconSize: [32, 37],
-      iconAnchor: [16, 37],
-      popupAnchor: [0, -30]
-    });
+    //  Punkt med ikon
+    const markerIcon = L.icon({
+      iconUrl: "{{ url_for('static', filename='img/shoppingCart.png') }}",
+          iconSize: [32, 37],
+          iconAnchor: [16, 37],
+          popupAnchor: [0, -30]
+        });
     
-const marker = L.marker([60.484630287092585, 15.418267313673063], { icon: markerIcon })
-      .bindPopup("<b>Kupolen Köpcentrum</b><br><img src='{{ url_for('static', filename='img/kupolen.jpg') }}' width='150'>");
+  const marker = L.marker([60.484630287092585, 15.418267313673063], { icon: markerIcon })
+        .bindPopup("<b>Kupolen Köpcentrum</b><br><img src='{{ url_for('static', filename='img/kupolen.jpg') }}' width='150'>");
 
       // Skapa en shopping-ikon med Leaflets inbyggda markör-ikon
-    const schoolIcon = L.icon({
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png', // Standard Leaflet markör
-      iconSize: [25, 41], // Storlek på ikonen
-      iconAnchor: [12, 41], // Fästpunkt på ikonen
-      popupAnchor: [1, -34] // Popupens placering relativt ikonen
-    });
+const schoolIcon = L.icon({
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png', // Standard Leaflet markör
+  iconSize: [25, 41], // Storlek på ikonen
+  iconAnchor: [12, 41], // Fästpunkt på ikonen
+  popupAnchor: [1, -34] // Popupens placering relativt ikonen
+});
 
 
       // Lägg till allt i layerGroup
-    taskone.addLayer(polyline);
-    taskone.addLayer(polygon);
-    taskone.addLayer(marker);
-    taskone.addLayer(markerIcon);
+    taskOneLayerGroup.addLayer(polyline);
+    taskOneLayerGroup.addLayer(polygon);
+    taskOneLayerGroup.addLayer(marker);
+    taskOneLayerGroup.addLayer(markerIcon);
     
 
     // Knapp Task 1
     document.getElementById("t1").addEventListener("click", () => {
       if (taskoneActive) {
         // Döljer lager för Task 1
-        taskone.removeFrom(mymap);
+        taskOneLayerGroup.removeFrom(mymap);
         taskoneActive = false;
       } else {
         // Visar lager för Task 1
-        taskone.addTo(mymap);
+        taskOneLayerGroup.addTo(mymap);
         taskoneActive = true;
       }
     });
@@ -238,14 +226,21 @@ const schoolLine = [
 
 document.getElementById("t2").addEventListener("click", () => {
   if (taskTwoActive) {
+    // Ta bort skolor
     taskTwoLayerGroup.removeFrom(mymap);
+
+    // Ta bort mätverktyget (hela kontrollen)
     if (polylineMeasureControl) {
-      
       mymap.removeControl(polylineMeasureControl);
+      polylineMeasureControl = null; // Viktigt: nollställ den
     }
+
     taskTwoActive = false;
   } else {
+    // Lägg till skolor
     taskTwoLayerGroup.addTo(mymap);
+
+    // Skapa och lägg till kontrollen
     polylineMeasureControl = L.control.polylineMeasure({
       position: 'bottomright',
       showBearings: true,
@@ -254,7 +249,7 @@ document.getElementById("t2").addEventListener("click", () => {
       showClearControl: true
     }).addTo(mymap);
 
-   
+    // Lägg till linjerna
     polylineMeasureControl.seed([schoolLine]);
 
     taskTwoActive = true;
@@ -350,7 +345,7 @@ document.getElementById("t2").addEventListener("click", () => {
 
     // --------------- Task 3 --------------- //
 
-    const taskThree = L.layerGroup();
+    const taskThreeLayerGroup = L.layerGroup();
     let taskThreeActive = false;
 
     // Skapa supermarket markers utan bilder (circleMarker istället för marker)
@@ -370,7 +365,7 @@ document.getElementById("t2").addEventListener("click", () => {
         layer.bindPopup(`<b>${name}</b>`);
       }
     });
-    taskThree.addLayer(superMarkers);
+    taskThreeLayerGroup.addLayer(superMarkers);
 
     // Buffra varje supermarketpunkt med Turf.js
     const bufferedFeatures = supermarket.features.map(feature => {
@@ -389,7 +384,7 @@ document.getElementById("t2").addEventListener("click", () => {
         fillOpacity: 0.4
       }
     });
-    taskThree.addLayer(bufferLayer);
+    taskThreeLayerGroup.addLayer(bufferLayer);
 
     // Identifiera icke-överlappande butiker
     const nonOverlapping = [];
@@ -430,15 +425,15 @@ document.getElementById("t2").addEventListener("click", () => {
         layer.bindPopup(" Ej överlappande:<br><b>" + name + "</b>");
       }
     });
-    taskThree.addLayer(nonOverlapLayer);
+    taskThreeLayerGroup.addLayer(nonOverlapLayer);
 
     // Toggle-knapp Task 3
     document.getElementById("t3").addEventListener("click", () => {
       if (taskThreeActive) {
-        taskThree.removeFrom(mymap);
+        taskThreeLayerGroup.removeFrom(mymap);
         taskThreeActive = false;
       } else {
-        taskThree.addTo(mymap);
+        taskThreeLayerGroup.addTo(mymap);
         taskThreeActive = true;
       }
     });
@@ -475,32 +470,25 @@ document.getElementById("t2").addEventListener("click", () => {
 
     // --------------- Task 5 --------------- //
 
-    /*
-    const taskFiveLayerGroup = L.layerGroup();
-    let taskFiveActive = false;
-    const fuelCluster = L.markerClusterGroup() // Skapa en markerClusterGroup för bränslestationer
+    const taskFiveLayerGroup = L.layerGroup(); // Skapar en tom lagergrupp
+    let taskFiveActive = false; // Initierar taskFive som false för att dölja den från början
+
+    const fuelCluster = L.markerClusterGroup(); // Grupperar bränslestationerna i kluster
+
     const fuelMarkers = L.geoJSON(fuel, {
-      pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, {
-          icon: L.icon({
-            iconUrl: "{{ url_for('static', filename='img/fuel.png') }}",
-            iconSize: [32, 37],
-            iconAnchor: [16, 37],
-            popupAnchor: [0, -30]
-          })
-        });
+      pointToLayer: function (feature, latlng) { 
+        return L.marker(latlng, { icon: defaultIcon }); // Skapar en punkt med ikon för varje bränslestation 
       },
       onEachFeature: function (feature, layer) {
         const name = feature.properties.name || "Okänd station";
-        layer.bindPopup(`<b>${name}</b>`);
+        layer.bindPopup(`<b>${name}</b>`); // Lägger till namnet på stationen från filen
       }
     });
-    
-    fuelCluster.addLayer(fuelMarkers); // Lägg till bränslestationer i cluster
-    taskFiveLayerGroup.addLayer(fuelCluster); // Lägg till cluster i lagergruppen
-    
 
-    document.getElementById("t5").addEventListener("click", () => {
+    fuelCluster.addLayer(fuelMarkers);
+    taskFiveLayerGroup.addLayer(fuelCluster); // Lägger till klustret av bensinstationer i den tidigare tomma lagergruppen
+
+    document.getElementById("t5").addEventListener("click", () => { // Lägger till en lyssnare på knappen för att aktivera task 5
       if (taskFiveActive) {
         taskFiveLayerGroup.removeFrom(mymap);
         taskFiveActive = false;
@@ -509,10 +497,8 @@ document.getElementById("t2").addEventListener("click", () => {
         taskFiveActive = true;
       }
     });
-
-    */
     // --------------- Task 6 --------------- //
-    const taskSix = L.layerGroup();
+    const taskSixLayerGroup = L.layerGroup();
     let taskSixActive = false;
     
     // Lista över städer
@@ -551,15 +537,7 @@ document.getElementById("t2").addEventListener("click", () => {
             </small>
           `;
     
-          // Skapa markör med popup
-          const defaultIcon = L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-          });
+
           
           const marker = L.marker(cityObj.coords, { icon: defaultIcon }).bindPopup(popupContent);
           
@@ -585,7 +563,7 @@ document.getElementById("t2").addEventListener("click", () => {
             sidebar.open('home');
           });
     
-          taskSix.addLayer(marker);
+          taskSixLayerGroup(marker);
         })
         .catch(error => {
           console.error("❗ Fel vid väderhämtning:", error);
@@ -596,18 +574,96 @@ document.getElementById("t2").addEventListener("click", () => {
     // Toggle-knapp Task 6
     document.getElementById("t6").addEventListener("click", () => {
       if (taskSixActive) {
-        taskSix.removeFrom(mymap);
+        taskSixLayerGroup(mymap);
         taskSixActive = false;
       } else {
-        taskSix.clearLayers(); // rensa gamla markörer om någon redan finns
+        taskSixLayerGroup(); // rensa gamla markörer om någon redan finns
         cities.forEach(city => getWeatherInfo(city));
-        taskSix.addTo(mymap);
+        taskSixLayerGroup(mymap);
         taskSixActive = true;
       }
     });
     
 
-    // --------------- Task 7 --------------- //
+// --------------- Task 7 - K-Means Clustering --------------- //
+ // Toggle-knapp Task 7
+document.getElementById("t7").addEventListener("click", () => {
+  if (window.schoolClusterLayer) {
+    // Toggle visa/dölj kluster
+    if (mymap.hasLayer(schoolClusterLayer)) {
+      mymap.removeLayer(schoolClusterLayer);
+    } else {
+      mymap.addLayer(schoolClusterLayer);
+    }
+    return;
+  }
+
+  fetch("/static/src/school_locations.csv")
+    .then(res => res.text())
+    .then(csvText => {
+      const parsed = Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true
+      });
+
+      const features = parsed.data.map(school => {
+        const lat = parseFloat(school.ycoord);
+        const lng = parseFloat(school.xcoord);
+        const name = school.Name;
+        const description = school.descriptio;
+
+        if (isNaN(lat) || isNaN(lng)) return null;
+
+        return {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [lng, lat]
+          },
+          properties: {
+            name,
+            description
+          }
+        };
+      }).filter(Boolean); // Ta bort null
+
+      const geojson = {
+        type: "FeatureCollection",
+        features
+      };
+
+      // Använd Turf.js för k-means clustering
+      const clustered = turf.clustersKmeans(geojson, { numberOfClusters: 3 });
+
+      // Skapa Leaflet layerGroup
+      window.schoolClusterLayer = L.layerGroup();
+
+      // Färger för kluster
+      const colors = ["red", "green", "blue"];
+
+      clustered.features.forEach(f => {
+        const coords = f.geometry.coordinates;
+        const clusterId = f.properties.cluster;
+        const color = colors[clusterId % colors.length];
+
+        const marker = L.circleMarker([coords[1], coords[0]], {
+          radius: 8,
+          fillColor: color,
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        }).bindPopup(`<b>${f.properties.name}</b><br>${f.properties.description}`);
+
+        schoolClusterLayer.addLayer(marker);
+      });
+
+      schoolClusterLayer.addTo(mymap);
+    });
+});
+
+
+
    
 
 
