@@ -5,7 +5,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)  # Tillåt frontend att anropa API
 
-API_KEY = '4cc9f538b61e143738bb57412f2289a5'  # Din riktiga API-nyckel
+API_KEY = 'd0db11e853f00b2dc16776f5c49ad76d'  # Din riktiga API-nyckel
+
 
 # Starta sidan
 @app.route('/')
