@@ -171,14 +171,7 @@
       { maxWidth: 300, minWidth: 300 }
     );
 
-    // Skapa en shopping-ikon med Leaflets inbyggda markör-ikon
-    const schoolIcon = L.icon({
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png', // Standard Leaflet markör
-      iconSize: [25, 41], // Storlek på ikonen
-      iconAnchor: [12, 41], // Fästpunkt på ikonen
-      popupAnchor: [1, -34] // Popupens placering relativt ikonen
-    });
-
+    
     // Lägg till allt i layerGroup
     taskOneLayerGroup.addLayer(polyline);
     taskOneLayerGroup.addLayer(polygon);
@@ -211,6 +204,13 @@
       { lat: 60.48226, lng: 15.43970 },
       { lat: 60.49316, lng: 15.41439 }
     ];
+    //Icon över skolor
+    const schoolIcon = L.icon({
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png', // Standard Leaflet markör
+      iconSize: [25, 41], // Storlek på ikonen
+      iconAnchor: [12, 41], // Fästpunkt på ikonen
+      popupAnchor: [1, -34] // Popupens placering relativt ikonen
+    });
 
     document.getElementById("t2").addEventListener("click", () => {
       if (taskTwoActive) {
